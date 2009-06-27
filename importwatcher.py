@@ -2,33 +2,33 @@ import sys
 
 class ImportWatcher(object):
 	def __init__(self):
-		self.modules = {}
-		self.keys = set()
-	
-	def save(self):
+		"""create a new watcher based on the current sys.modules state"""
 		self.modules = sys.modules.copy()
 		self.keys = set(self.modules.keys())
 
-	@classmethod
-	def save_state(cls):
-		instance = cls()
-		instance.save()
-		return instance
-	
 	def __contains__(self, item):
 		return item in self.keys
 	
 	def __getitem__(self, item):
-		print "\n".join(sorted(self.keys))
-		print self.diff()
 		return self.modules[item]
 
 	def restore(self):
+		"""
+		delete all modules that were loaded after this
+		watcher was created.
+		Returns a dict of the format module_name: module_object
+		containing all deleted modules
+		"""
+		
 		def _del(modname):
 			del sys.modules[modname]
 		return self._diff(_del)
 	
 	def diff(self):
+		"""
+		return the difference between the initial snapshot and the
+		currently loaded modules
+		"""
 		return self._diff()
 	
 	def _diff(self, callback=None):

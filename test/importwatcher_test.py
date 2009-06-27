@@ -12,14 +12,14 @@ def add_fixture_path():
 class ImportWatcherTest(TestCase):
 	def setUp(self):
 		add_fixture_path()
-		self.initial_state = ImportWatcher.save_state()
+		self.initial_state = ImportWatcher()
 	
 	def tearDown(self):
 		self.initial_state.restore()
 		
 	def test_should_save_initial_import_list(self):
 		import md5
-		state = ImportWatcher.save_state()
+		state = ImportWatcher()
 		self.assertTrue('md5' in state)
 		import fixture1
 		self.assertFalse('fixture1' in state)
@@ -45,7 +45,7 @@ class ImportWatcherTest(TestCase):
 	def test_should_not_include_nested_but_unimported_modules(self):
 		import nested
 		print nested.__path__
-		state = ImportWatcher.save_state()
+		state = ImportWatcher()
 		self.assertRaises(AttributeError, lambda: nested.unimported)
 		self.assertTrue('nested' in state)
 		self.assertTrue('nested.imported' in state)
@@ -53,7 +53,7 @@ class ImportWatcherTest(TestCase):
 	
 	def test_should_include_dynamically_loaded_modules(self):
 		__import__('fixture1')
-		state = ImportWatcher.save_state()
+		state = ImportWatcher()
 		self.assertTrue('fixture1' in state)
 	
 def imported(modname):
